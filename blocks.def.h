@@ -1,9 +1,14 @@
-//Modify this file to change what commands output to your statusbar, and recompile using the make command.
-static const Block blocks[] = {
-	/*Icon*/	/*Command*/		/*Update Interval*/	/*Update Signal*/
-	{"Mem:", "free -h | awk '/^Mem/ { print $3\"/\"$2 }' | sed s/i//g",	30,		0},
+void lctime(char *buf, int len);
+void uptime(char *buf, int len);
 
-	{"", "date '+%b %d (%a) %I:%M%p'",					5,		0},
+//Modify this file to change what commands output to your statusbar, and recompile using the make command.
+#define ASTRO_PATH "/opt/astro/meeus/bash/"
+static const Block blocks[] = {
+	/*Icon*/	/*Command*/		/* Function pointer */  /*Update Interval*/	/*Update Signal*/
+	{"Mem:", "free -h | awk '/^Mem/ { print $3\"/\"$2 }' | sed s/i//g",	NULL, 30,		0},
+	{"Up", "", uptime,					60,		0},
+	{"", "", lctime,					1,		0},
+	{"", "ASTRO_SH_LIB_PATH="ASTRO_PATH"lib "ASTRO_PATH"prg/sun_coord.sh 43.56 -7.12", NULL,					5,		0},
 };
 
 //sets delimeter between status commands. NULL character ('\0') means no delimeter.

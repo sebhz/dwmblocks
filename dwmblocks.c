@@ -21,6 +21,7 @@
 typedef struct {
 	char* icon;
 	char* command;
+    void (*func)(char *, int);
 	unsigned int interval;
 	unsigned int signal;
 } Block;
@@ -49,35 +50,41 @@ static void (*writestatus) () = pstdout;
 
 
 #include "blocks.h"
+#include "monitors.h"
 
 static char statusbar[LENGTH(blocks)][CMDLENGTH] = {0};
 static char statusstr[2][STATUSLENGTH];
 static int statusContinue = 1;
 static int returnStatus = 0;
 
+
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {
+    int i = strlen(block->icon);
 	strcpy(output, block->icon);
-	FILE *cmdf = popen(block->command, "r");
-	if (!cmdf)
-		return;
-	int i = strlen(block->icon);
-	fgets(output+i, CMDLENGTH-i-delimLen, cmdf);
+    if (block->func == NULL) {
+        FILE *cmdf = popen(block->command, "r");
+        if (!cmdf)
+            return;
+        fgets(output+i, CMDLENGTH-i-delimLen, cmdf);
+		pclose(cmdf);
+    }
+    else {
+        block->func(output+i, CMDLENGTH-i-delimLen);
+    }
 	i = strlen(output);
 	if (i == 0) {
 		//return if block and command output are both empty
-		pclose(cmdf);
 		return;
 	}
 	if (delim[0] != '\0') {
 		//only chop off newline if one is present at the end
 		i = output[i-1] == '\n' ? i-1 : i;
-		strncpy(output+i, delim, delimLen); 
+		strncpy(output+i, delim, delimLen);
 	}
 	else
 		output[i++] = '\0';
-	pclose(cmdf);
 }
 
 void getcmds(int time)
