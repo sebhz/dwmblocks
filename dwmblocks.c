@@ -35,7 +35,7 @@ void setupsignals();
 void sighandler(int signum);
 int getstatus(char *str, char *last);
 void statusloop();
-void termhandler();
+void termhandler(int);
 void pstdout();
 #ifndef NO_X
 void setroot();
@@ -47,16 +47,14 @@ static Window root;
 #else
 static void (*writestatus) () = pstdout;
 #endif
+void launch_volume(void);
 
-
+#include "dwmblocks.h"
 #include "blocks.h"
-#include "monitors.h"
 
 static char statusbar[LENGTH(blocks)][CMDLENGTH] = {0};
 static char statusstr[2][STATUSLENGTH];
 static int statusContinue = 1;
-static int returnStatus = 0;
-
 
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
@@ -191,7 +189,7 @@ void sighandler(int signum)
 	writestatus();
 }
 
-void termhandler()
+void termhandler(int v)
 {
 	statusContinue = 0;
 }

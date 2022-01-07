@@ -1,17 +1,19 @@
-PREFIX ?= /usr/local
-CC ?= cc
-LDFLAGS = -lX11
+CC=gcc
+CFLAGS=-Wall -DREENTRANT
+LDFLAGS=-lX11 -lpulse -lstdc++
 
-output: dwmblocks.c blocks.def.h blocks.h
-	${CC}  dwmblocks.c $(LDFLAGS) -o dwmblocks
-blocks.h:
-	cp blocks.def.h $@
+COM=\
+	components/datetime \
+	components/uptime \
+	components/loadavg
 
+all: dwmblocks
+
+.c.o:
+	$(CC) -o $@ -c $(CFLAGS) $<
+
+dwmblocks: dwmblocks.o $(COM:=.o)
+	$(CC) -o $@ $(COM:=.o) dwmblocks.o $(LDFLAGS)
 
 clean:
-	rm -f *.o *.gch dwmblocks
-install: output
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	install -m 0755 dwmblocks $(DESTDIR)$(PREFIX)/bin/dwmblocks
-uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/dwmblocks
+	rm -f *.o components/*.o *.gch dwmblocks
