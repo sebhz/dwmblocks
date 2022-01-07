@@ -15,5 +15,8 @@ all: dwmblocks
 dwmblocks: dwmblocks.o $(COM:=.o)
 	$(CC) -o $@ $(COM:=.o) dwmblocks.o $(LDFLAGS)
 
+indent:
+	indent -braces-on-if-lines --no-tabs --indent-level4 *.c *.h components/*.c
+
 clean:
 	rm -f *.o components/*.o *.gch dwmblocks
