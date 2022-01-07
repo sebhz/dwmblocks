@@ -20,3 +20,4 @@ indent:
 
 clean:
 	rm -f *.o components/*.o *.gch dwmblocks
+
