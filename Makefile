@@ -1,11 +1,14 @@
 CC     ?= cc
 CFLAGS  = -pedantic -Wall -Wno-deprecated-declarations -Os
-LDFLAGS = -lX11
+LDFLAGS = -lX11 -lm
 
 COM=\
 	components/datetime \
 	components/uptime \
-	components/loadavg
+	components/loadavg \
+	components/battery \
+	components/sun \
+	components/util
 
 all: options dwmblocks
 
@@ -18,8 +21,8 @@ options:
 .c.o:
 	$(CC) -o $@ -c $(CFLAGS) $<
 
-dwmblocks: dwmblocks.o $(COM:=.o)
-	$(CC) -o $@ $(COM:=.o) dwmblocks.o $(LDFLAGS)
+dwmblocks: dwmblocks.o $(COM:=.o) components/libmeeus.a
+	$(CC) -o $@ $(COM:=.o) components/libmeeus.a dwmblocks.o $(LDFLAGS)
 
 indent:
 	indent -braces-on-if-lines --no-tabs --indent-level4 *.c *.h components/*.c
