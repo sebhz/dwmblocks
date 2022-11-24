@@ -1,14 +1,14 @@
-CC     ?= cc
+CC      = gcc
 CFLAGS  = -pedantic -Wall -Wno-deprecated-declarations -Os
 LDFLAGS = -lX11 -lm
 
-COM=\
-	components/datetime \
-	components/uptime \
-	components/loadavg \
-	components/battery \
-	components/sun \
-	components/util
+COMPONENT_OBJS=\
+	components/datetime.o \
+	components/uptime.o \
+	components/loadavg.o \
+	components/battery.o \
+	components/sun.o \
+	components/util.o
 
 all: options dwmblocks
 
@@ -18,16 +18,13 @@ options:
 	@echo "LDFLAGS = ${LDFLAGS}"
 	@echo "CC      = ${CC}"
 
-.c.o:
-	$(CC) -o $@ -c $(CFLAGS) $<
-
-dwmblocks: dwmblocks.o $(COM:=.o) components/libmeeus.a
-	$(CC) -o $@ $(COM:=.o) components/libmeeus.a dwmblocks.o $(LDFLAGS)
+dwmblocks: dwmblocks.o $(COMPONENT_OBJS) components/libmeeus.a
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 indent:
 	indent -braces-on-if-lines --no-tabs --indent-level4 *.c *.h components/*.c
 
 clean:
-	rm -f *.o components/*.o *.gch dwmblocks
+	rm -f *.o components/*.o  dwmblocks
 
 .PHONY: all options clean
