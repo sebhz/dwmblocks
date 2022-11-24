@@ -10,16 +10,17 @@
 
 const char *bat = "BAT0";
 
-int battery_perc(void)
+int
+battery_perc (void)
 {
     int perc;
     char path[PATH_MAX];
 
-    if (esnprintf(path, sizeof(path),
-                  "/sys/class/power_supply/%s/capacity", bat) < 0) {
+    if (esnprintf (path, sizeof (path),
+                   "/sys/class/power_supply/%s/capacity", bat) < 0) {
         return -1;
     }
-    if (pscanf(path, "%d", &perc) != 1) {
+    if (pscanf (path, "%d", &perc) != 1) {
         return -1;
     }
 
@@ -27,38 +28,40 @@ int battery_perc(void)
 }
 
 char *
-battery_state(void)
+battery_state (void)
 {
-    static struct {
+    static struct
+    {
         char *state;
         char *symbol;
     } map[] = {
-        { "Charging",    "↗" },
-        { "Discharging", "↘" },
-        { "Full",        "↔" },
+        {"Charging", "↗"},
+        {"Discharging", "↘"},
+        {"Full", "↔"},
     };
     size_t i;
     char path[PATH_MAX], state[12];
 
-    if (esnprintf(path, sizeof(path),
-                  "/sys/class/power_supply/%s/status", bat) < 0) {
+    if (esnprintf (path, sizeof (path),
+                   "/sys/class/power_supply/%s/status", bat) < 0) {
         return NULL;
     }
-    if (pscanf(path, "%12s", state) != 1) {
+    if (pscanf (path, "%12s", state) != 1) {
         return NULL;
     }
 
-    for (i = 0; i < LEN(map); i++) {
-        if (!strcmp(map[i].state, state)) {
+    for (i = 0; i < LEN (map); i++) {
+        if (!strcmp (map[i].state, state)) {
             break;
         }
     }
-    return (i == LEN(map)) ? "?" : map[i].symbol;
+    return (i == LEN (map)) ? "?" : map[i].symbol;
 }
 
-void battery(char *buf, int len)
+void
+battery (char *buf, int len)
 {
-    int perc = battery_perc();
-    char *state = battery_state();
-    snprintf(buf, len, "%-3d%% %s", perc, state);
+    int perc = battery_perc ();
+    char *state = battery_state ();
+    snprintf (buf, len, "%-3d%% %s", perc, state);
 }

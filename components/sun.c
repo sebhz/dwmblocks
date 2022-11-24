@@ -25,9 +25,10 @@ get_sun_coord (double phi, double L, double *A, double *h)
     *h += ref_refraction_true_to_apparent (*h, 1) / 60;
 }
 
-void sun(char *buf, int len)
+void
+sun (char *buf, int len)
 {
     double A, h;
-    get_sun_coord(43.56, -7.12, &A, &h);
+    get_sun_coord (43.56, -7.12, &A, &h);
     snprintf (buf, len, "α=%.2f, γ=%.2f", h, A);
 }

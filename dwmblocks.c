@@ -42,7 +42,7 @@ int getstatus (char *str, char *last);
 void statusloop ();
 void termhandler (int);
 void pstdout ();
-void psomebar();
+void psomebar ();
 
 #ifndef NO_X
 void setroot ();
@@ -181,23 +181,24 @@ pstdout ()
     fflush (stdout);
 }
 
-void psomebar()
+void
+psomebar ()
 {
-	if (!getstatus(statusstr[0], statusstr[1]))//Only write out if text has changed.
-		return;
-	if (somebarFd < 0) {
-		somebarFd = open(somebarPath, O_WRONLY|O_CLOEXEC);
-		if (somebarFd < 0 && errno == ENOENT) {
-			// assume somebar is not ready yet
-			sleep(1);
-			somebarFd = open(somebarPath, O_WRONLY|O_CLOEXEC);
-		}
-		if (somebarFd < 0) {
-			perror("open");
-			return;
-		}
-	}
-	dprintf(somebarFd, "status %s\n", statusstr[0]);
+    if (!getstatus (statusstr[0], statusstr[1]))        //Only write out if text has changed.
+        return;
+    if (somebarFd < 0) {
+        somebarFd = open (somebarPath, O_WRONLY | O_CLOEXEC);
+        if (somebarFd < 0 && errno == ENOENT) {
+            // assume somebar is not ready yet
+            sleep (1);
+            somebarFd = open (somebarPath, O_WRONLY | O_CLOEXEC);
+        }
+        if (somebarFd < 0) {
+            perror ("open");
+            return;
+        }
+    }
+    dprintf (somebarFd, "status %s\n", statusstr[0]);
 }
 
 void
@@ -237,10 +238,11 @@ termhandler (int v)
     statusContinue = 0;
 }
 
-void sigpipehandler()
+void
+sigpipehandler ()
 {
-	close(somebarFd);
-	somebarFd = -1;
+    close (somebarFd);
+    somebarFd = -1;
 }
 
 int
@@ -251,17 +253,17 @@ main (int argc, char **argv)
             strncpy (delim, argv[++i], delimLen);
         else if (!strcmp ("-p", argv[i]))
             writestatus = pstdout;
-		else if (!strcmp("-s",argv[i]))
-			strcpy(somebarPath, argv[++i]);
-		else if (!strcmp("-w",argv[i]))
+        else if (!strcmp ("-s", argv[i]))
+            strcpy (somebarPath, argv[++i]);
+        else if (!strcmp ("-w", argv[i]))
             usesomebar = 1;
     }
 
     if (usesomebar) {
-	    if (!strlen(somebarPath)) {
-		    strcpy(somebarPath, getenv("XDG_RUNTIME_DIR"));
-		    strcat(somebarPath, "/somebar-0");
-	    }
+        if (!strlen (somebarPath)) {
+            strcpy (somebarPath, getenv ("XDG_RUNTIME_DIR"));
+            strcat (somebarPath, "/somebar-0");
+        }
         writestatus = psomebar;
     }
 #ifndef NO_X
@@ -274,7 +276,7 @@ main (int argc, char **argv)
     delim[delimLen++] = '\0';
     signal (SIGTERM, termhandler);
     signal (SIGINT, termhandler);
-	signal (SIGPIPE, sigpipehandler);
+    signal (SIGPIPE, sigpipehandler);
     statusloop ();
 #ifndef NO_X
     if (!usesomebar) {
