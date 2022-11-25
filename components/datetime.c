@@ -9,12 +9,13 @@ static const char *const duodecimal_chars[12] =
     { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "↊", "↋" };
 static const char *const hour_names[13] =
     { "midnight", "one", "two", "three", "four", "five", "six", "seven",
-"eight", "nine", "ten", "eleven", "noon" };
+    "eight", "nine", "ten", "eleven", "noon"
+};
 static const char *const minute_names[7] =
     { "", "five", "ten", "a quarter", "twenty", "twenty five", "half" };
 
 void
-dozenal_time (char *buf, int len)
+dozenaltime (char *buf, int len)
 {
     int hours_per_day = 12, is_semidiurnal = 0;
     double decimal_secs;
@@ -43,14 +44,14 @@ dozenal_time (char *buf, int len)
 }
 
 void
-internet_time (char *buf, int len)
+internettime (char *buf, int len)
 {
     time_t secs = (time (NULL) + 3600) % SECS_PER_DAY;  /* BMT is UTC + 1 */
     snprintf (buf, len, "@%3.2f", (float) (secs) / SECS_PER_DAY * 1000);
 }
 
 void
-fuzzy_time (char *buf, int len)
+fuzzytime (char *buf, int len)
 {
     const char *hour_name, *min_name;
     int round_min;
@@ -90,7 +91,7 @@ fuzzy_time (char *buf, int len)
 }
 
 void
-hex_time (char *buf, int len)
+hextime (char *buf, int len)
 {
     time_t rawtime;
     struct tm *timeinfo;
