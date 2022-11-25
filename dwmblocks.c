@@ -78,7 +78,9 @@ getcmd (const Block * block, char *output)
         FILE *cmdf = popen (block->command, "r");
         if (!cmdf)
             return;
-        fgets (output + i, CMDLENGTH - i - delimLen, cmdf);
+        if (fgets (output + i, CMDLENGTH - i - delimLen, cmdf) == NULL) {
+            /* Purposedly empty. If a block is misbehaving check here */
+        }
         pclose (cmdf);
     }
     else {

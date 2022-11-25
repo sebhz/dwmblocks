@@ -1,5 +1,5 @@
 CC      = gcc
-CFLAGS  = -pedantic -Wall -Wno-deprecated-declarations -Os
+CFLAGS  = -pedantic -Wall -Os
 LDFLAGS = -lX11 -lm
 
 COMPONENT_OBJS=\
