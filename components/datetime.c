@@ -4,6 +4,7 @@
 
 #define fmt "%m/%d %H:%M WW%V"
 #define SECS_PER_DAY 86400
+#define tm_to_secs(tm) ((tm)->tm_sec + (tm)->tm_min*60.0 + (tm)->tm_hour*3600)
 
 static const char *const duodecimal_chars[12] =
     { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "↊", "↋" };
@@ -28,8 +29,7 @@ dozenaltime (char *buf, int len)
 
     if (is_semidiurnal)
         hours_per_day = 24;
-    decimal_secs =
-        timeinfo->tm_sec + timeinfo->tm_min * 60.0 + timeinfo->tm_hour * 3600;
+    decimal_secs = tm_to_secs (timeinfo);
     dozenal_secs =
         (int) (decimal_secs / SECS_PER_DAY * hours_per_day * 144 * 144);
     dz_sec = dozenal_secs % 144;
@@ -68,7 +68,7 @@ fuzzytime (char *buf, int len)
     }
 
     round_min = ((timeinfo->tm_min + 2) % 60) / 5;
-    if (round_min <= 6) {       /* Minutes past hour */
+    if (timeinfo->tm_min <= 32) {       /* Minutes past hour */
         hour_name =
             timeinfo->tm_hour ==
             12 ? hour_names[12] : hour_names[timeinfo->tm_hour % 12];
@@ -78,7 +78,7 @@ fuzzytime (char *buf, int len)
         hour_name =
             timeinfo->tm_hour ==
             11 ? hour_names[12] : hour_names[(timeinfo->tm_hour + 1) % 12];
-        min_name = minute_names[12 - round_min];
+        min_name = minute_names[(12 - round_min) % 12];
     }
 
     snprintf (buf, len, "%s%s%s%s%s",
@@ -99,8 +99,7 @@ hextime (char *buf, int len)
 
     time (&rawtime);
     timeinfo = localtime (&rawtime);
-    decimal_secs =
-        timeinfo->tm_sec + timeinfo->tm_min * 60.0 + timeinfo->tm_hour * 3600;
+    decimal_secs = tm_to_secs (timeinfo);
     hexa_secs = (int) ((float) decimal_secs / SECS_PER_DAY * 0x10000);
     snprintf (buf, len, "%X_%02X_%X",
               hexa_secs >> 12, (hexa_secs >> 4) & 0xFF, hexa_secs & 0xF);
