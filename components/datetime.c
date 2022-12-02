@@ -105,6 +105,44 @@ hextime (char *buf, int len)
               hexa_secs >> 12, (hexa_secs >> 4) & 0xFF, hexa_secs & 0xF);
 }
 
+/* Alien code binary time - original idea taken from
+   https://github.com/raboof/notion/blob/main/contrib/statusd/statusd_binclock.lua */
+//#define ALIEN_SHOW_SECS
+#define BIT(x, b) (((x) >> (b)) & 0x1)
+void
+alientime (char *buf, int len)
+{
+    time_t rawtime;
+    struct tm *timeinfo;
+    int i, alien_index;
+    const char alien_codes[4] = { '_', '.', '\'', ':' };
+    // const char alien_codes[4] = {'-', ',', '^', '='};
+#ifdef ALIEN_SHOW_SECS
+    const int max_len = 14;
+    const char separator = '/';
+#else
+    const int max_len = 7;
+#endif
+    if (len < max_len)
+        return;
+
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+
+    for (i = 0; i < 6; i++) {
+        alien_index =
+            (BIT (timeinfo->tm_hour, 5 - i) << 1) + BIT (timeinfo->tm_min,
+                                                         5 - i);
+        buf[i] = alien_codes[alien_index];
+#ifdef ALIEN_SHOW_SECS
+        buf[i + 7] = alien_codes[BIT (timeinfo->tm_sec, 5 - i)];
+#endif
+    }
+#ifdef ALIEN_SHOW_SECS
+    buf[6] = separator;
+#endif
+    buf[max_len - 1] = '\0';
+}
 
 void
 datetime (char *buf, int len)
