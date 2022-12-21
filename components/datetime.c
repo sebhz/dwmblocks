@@ -12,6 +12,13 @@ static const char *const hour_names[13] =
     { "midnight", "one", "two", "three", "four", "five", "six", "seven",
     "eight", "nine", "ten", "eleven", "noon"
 };
+
+static const char *const month_names[12] = {
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+};
+static const char *const suffixes[10] =
+    { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
 static const char *const minute_names[7] =
     { "", "five", "ten", "a quarter", "twenty", "twenty five", "half" };
 
@@ -81,7 +88,9 @@ fuzzytime (char *buf, int len)
         min_name = minute_names[(12 - round_min) % 12];
     }
 
-    snprintf (buf, len, "%s%s%s%s%s",
+    snprintf (buf, len, "%s %d%s, %s%s%s%s%s",
+              month_names[timeinfo->tm_mon],
+              timeinfo->tm_mday, suffixes[timeinfo->tm_mday % 10],
               timeinfo->tm_min % 5 ? "about " : "",
               min_name,
               (round_min == 0) ? "" : (timeinfo->tm_min <=
