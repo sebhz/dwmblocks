@@ -12,7 +12,6 @@ static const char *const hour_names[13] =
     { "midnight", "one", "two", "three", "four", "five", "six", "seven",
     "eight", "nine", "ten", "eleven", "noon"
 };
-
 static const char *const month_names[12] = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -57,11 +56,14 @@ internettime (char *buf, int len)
     snprintf (buf, len, "@%3.2f", (float) (secs) / SECS_PER_DAY * 1000);
 }
 
+/* Should be small. */
+#define FUZZINESS 2
+#define FUZZY_INTERVAL (FUZZINESS * 2 + 1)
 void
 fuzzytime (char *buf, int len)
 {
     const char *hour_name, *min_name;
-    int round_min;
+    int round_min, hour_num;
     time_t rawtime;
     struct tm *timeinfo;
 
@@ -74,29 +76,26 @@ fuzzytime (char *buf, int len)
         return;
     }
 
-    round_min = ((timeinfo->tm_min + 2) % 60) / 5;
-    if (timeinfo->tm_min <= 32) {       /* Minutes past hour */
-        hour_name =
-            timeinfo->tm_hour ==
-            12 ? hour_names[12] : hour_names[timeinfo->tm_hour % 12];
+    round_min = ((timeinfo->tm_min + FUZZINESS) % 60) / FUZZY_INTERVAL;
+    if (timeinfo->tm_min <= 30 + FUZZINESS) {       /* Minutes past hour */
+        hour_num = (timeinfo->tm_hour == 12 ? 12 : timeinfo->tm_hour % 12);
+        hour_name = hour_names[hour_num];
         min_name = minute_names[round_min];
     }
     else {                      /* Minutes to next hour */
-        hour_name =
-            timeinfo->tm_hour ==
-            11 ? hour_names[12] : hour_names[(timeinfo->tm_hour + 1) % 12];
+        hour_num = (timeinfo->tm_hour == 11 ? 12 : (timeinfo->tm_hour + 1) % 12);
+        hour_name = hour_names[hour_num];
         min_name = minute_names[(12 - round_min) % 12];
     }
 
     snprintf (buf, len, "%s %d%s, %s%s%s%s%s",
               month_names[timeinfo->tm_mon],
               timeinfo->tm_mday, suffixes[timeinfo->tm_mday % 10],
-              timeinfo->tm_min % 5 ? "about " : "",
+              timeinfo->tm_min % FUZZY_INTERVAL ? "about " : "",
               min_name,
-              (round_min == 0) ? "" : (timeinfo->tm_min <=
-                                       32) ? " past " : " to ", hour_name,
-              (round_min == 0)
-              && (timeinfo->tm_hour % 12 != 0) ? " o'clock" : "");
+              (round_min == 0) ? "" : (timeinfo->tm_min <= 30 + FUZZINESS) ? " past " : " to ",
+              hour_name,
+              (round_min == 0) && (hour_num % 12 != 0) ? " o'clock" : "");
 }
 
 void
