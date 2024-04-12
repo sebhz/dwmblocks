@@ -12,10 +12,6 @@ static const char *const hour_names[13] =
     { "midnight", "one", "two", "three", "four", "five", "six", "seven",
     "eight", "nine", "ten", "eleven", "noon"
 };
-static const char *const month_names[12] = {
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-};
 static const char *const suffixes[10] =
     { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
 static const char *const minute_names[7] =
@@ -59,6 +55,9 @@ internettime (char *buf, int len)
 /* Should be small. */
 #define FUZZINESS 2
 #define FUZZY_INTERVAL (FUZZINESS * 2 + 1)
+#define FUZZY_DATE_FMT "W%V, %B %-e"
+#define FUZZY_DATE_LEN 16
+
 void
 fuzzytime (char *buf, int len)
 {
@@ -66,6 +65,7 @@ fuzzytime (char *buf, int len)
     int round_min, hour_num;
     time_t rawtime;
     struct tm *timeinfo;
+    char dt[FUZZY_DATE_LEN];
 
     time (&rawtime);
     timeinfo = localtime (&rawtime);
@@ -87,10 +87,9 @@ fuzzytime (char *buf, int len)
         hour_name = hour_names[hour_num];
         min_name = minute_names[(12 - round_min) % 12];
     }
-
-    snprintf (buf, len, "%s %d%s, %s%s%s%s%s",
-              month_names[timeinfo->tm_mon],
-              timeinfo->tm_mday, suffixes[timeinfo->tm_mday % 10],
+    strftime (dt, FUZZY_DATE_LEN, FUZZY_DATE_FMT, timeinfo);
+    snprintf (buf, len, "%s%s, %s%s%s%s%s",
+              dt, suffixes[timeinfo->tm_mday % 10],
               timeinfo->tm_min % FUZZY_INTERVAL ? "about " : "",
               min_name,
               (round_min == 0) ? "" : (timeinfo->tm_min <= 30 + FUZZINESS) ? " past " : " to ",
