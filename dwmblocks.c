@@ -207,14 +207,14 @@ void
 statusloop ()
 {
     setupsignals ();
-    int i = 0;
+    int i = 1;
     getcmds (-1);
     while (1) {
+        sleep (1.0);
         getcmds (i++);
         writestatus ();
         if (!statusContinue)
             break;
-        sleep (1.0);
     }
 }
 
