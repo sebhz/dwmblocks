@@ -18,6 +18,8 @@ options:
 	@echo "LDFLAGS = ${LDFLAGS}"
 	@echo "CC      = ${CC}"
 
+dwmblocks.o: blocks.h
+
 dwmblocks: dwmblocks.o $(COMPONENT_OBJS) components/libmeeus.a
 	$(CC) -o $@ $^ $(LDFLAGS)
 
