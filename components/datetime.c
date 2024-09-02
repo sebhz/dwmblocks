@@ -56,7 +56,7 @@ internettime (char *buf, int len)
 #define FUZZINESS 2
 #define FUZZY_INTERVAL (FUZZINESS * 2 + 1)
 #define FUZZY_DATE_FMT "W%V, %B %-e"
-#define FUZZY_DATE_LEN 16
+#define FUZZY_DATE_LEN 24
 
 void
 fuzzytime (char *buf, int len)
